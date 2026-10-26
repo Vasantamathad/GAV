@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphics Algorithm Visualizer - Complete Project Report & Reference Manual</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0d9488;
+            --dark: #0f172a;
+            --gray-dark: #334155;
+            --gray-light: #f8fafc;
+            --border: #e2e8f0;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.65;
+            color: #1e293b;
+            background-color: #f1f5f9;
+            padding: 30px 15px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 50px 60px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+        }
+
+        /* Floating action banner */
+        .action-banner {
+            position: sticky;
+            top: 15px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 8px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        .action-banner h4 {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .action-banner span {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .print-btn {
+            background-color: #ffffff;
+            color: #1e3a8a;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .print-btn:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+        }
+
+        /* Cover header */
+        .project-header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-light);
+            padding-bottom: 25px;
+            margin-bottom: 35px;
+        }
+
+        .project-badge {
+            display: inline-block;
+            background-color: #eff6ff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            border: 1px solid #bfdbfe;
+        }
+
+        h1 {
+            color: var(--dark);
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Meta details table */
+        .meta-card {
+            background-color: var(--gray-light);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 18px 24px;
+            margin-bottom: 35px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            font-size: 13.5px;
+        }
+
+        .meta-item strong {
+            color: var(--primary);
+            display: block;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        /* Section Headings */
+        h2 {
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-light);
+            padding-left: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        h3 {
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            color: var(--gray-dark);
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+            margin-bottom: 6px;
+        }
+
+        p {
+            margin-bottom: 12px;
+            color: #334155;
+            font-size: 14.5px;
+        }
+
+        ul, ol {
+            padding-left: 22px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 13.5px;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 10px 14px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #fbfcfe;
+        }
+
+        /* Code snippets */
+        code {
+            background-color: #f1f5f9;
+            color: #be123c;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        pre {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12.5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            line-height: 1.5;
+            border: 1px solid #1e293b;
+        }
+
+        /* Callout Cards */
+        .callout {
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 18px 0;
+            font-size: 13.5px;
+            border-left: 4px solid;
+        }
+
+        .callout-info {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .callout-success {
+            background-color: #f0fdf4;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .callout-warning {
+            background-color: #fefce8;
+            border-color: #f59e0b;
+            color: #854d0e;
+        }
+
+        .callout-primary {
+            background-color: #f5f3ff;
+            border-color: #8b5cf6;
+            color: #5b21b6;
+        }
+
+        /* Grid Cards for Conditions */
+        .condition-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .condition-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .condition-card h5 {
+            font-size: 13.5px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .badge-case1 { background-color: #10b981; }
+        .badge-case2 { background-color: #f59e0b; }
+        .badge-case3 { background-color: #64748b; }
+        .badge-case4 { background-color: #3b82f6; }
+
+        /* Footer */
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12.5px;
+            color: #64748b;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                color: black;
+            }
+
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            h2 {
+                page-break-after: avoid;
+                margin-top: 25px;
+            }
+
+            table, pre, .callout, .condition-card {
+                page-break-inside: avoid;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm 15mm 15mm 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- Floating print bar (hidden during print) -->
+        <div class="action-banner no-print">
+            <div>
+                <h4>Graphics Algorithm Visualizer - Documentation & Report</h4>
+                <span>Ready to print or export as PDF • Keyboard shortcut: <b>Ctrl + P</b></span>
+            </div>
+            <button onclick="window.print()" class="print-btn">🖨️ Save as PDF / Print</button>
+        </div>
+
+        <!-- Document Header -->
+        <div class="project-header">
+            <span class="project-badge">Computer Graphics Project Documentation</span>
+            <h1>Graphical Algorithm Visualizer</h1>
+            <p class="subtitle">Comprehensive Technical Report, Mathematical Foundations & User Guide</p>
+        </div>
+
+        <!-- Project Metadata Table -->
+        <div class="meta-card">
+            <div class="meta-item">
+                <strong>Project Title</strong>
+                Graphical Algorithm Visualizer
+            </div>
+            <div class="meta-item">
+                <strong>Department</strong>
+                MCA Department
+            </div>
+            <div class="meta-item">
+                <strong>Project Guide</strong>
+                Dr. Ravikumar Roogi
+            </div>
+            <div class="meta-item">
+                <strong>Academic Year</strong>
+                2025 - 2027
+            </div>
+            <div class="meta-item">
+                <strong>Course / Subject</strong>
+                Computer Graphics & Visualization
+            </div>
+            <div class="meta-item">
+                <strong>Platform & Tools</strong>
+                C (C99), GCC MinGW-w64, WinBGIm (64-bit)
+            </div>
+        </div>
+
+        <!-- Project Team Members (Students) -->
+        <h2 style="margin-top: 25px; margin-bottom: 12px;">Project Team Members</h2>
+        <table style="width: 100%; margin-bottom: 30px;">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Sl. No.</th>
+                    <th style="width: 50%;">Student Name</th>
+                    <th style="width: 40%;">UUCMS Registration Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td><strong>Chaitra N</strong></td>
+                    <td><code>PO2DR25S126006</code></td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td><strong>Vasanta M</strong></td>
+                    <td><code>PO2DR25S126038</code></td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td><strong>Ananya S</strong></td>
+                    <td><code>PO2DR25S126002</code></td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td><strong>Riya N</strong></td>
+                    <td><code>PO2DR25S126023</code></td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td><strong>Misba M</strong></td>
+                    <td><code>P02DR25S126015</code></td>
+                </tr>
+                <tr>
+                    <td><strong>6</strong></td>
+                    <td><strong>Iranna K</strong></td>
+                    <td><code>P02DR25S126010</code></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Table of Contents -->
+        <h2>Table of Contents</h2>
+        <ol>
+            <li><a href="#sec1" style="color: #2563eb; text-decoration: none;">Project Overview & System Architecture</a></li>
+            <li><a href="#sec2" style="color: #2563eb; text-decoration: none;">Coordinate Mapping & Negative Point Handling</a></li>
+            <li><a href="#sec3" style="color: #2563eb; text-decoration: none;">Algorithm 1: DDA Line Drawing Algorithm</a></li>
+            <li><a href="#sec4" style="color: #2563eb; text-decoration: none;">Algorithm 2: Bresenham Line Drawing Algorithm</a></li>
+            <li><a href="#sec5" style="color: #2563eb; text-decoration: none;">Algorithm 3: Midpoint Line Drawing Algorithm (All Slopes & Quadrants)</a></li>
+            <li><a href="#sec6" style="color: #2563eb; text-decoration: none;">Algorithm 4: Midpoint Circle Drawing Algorithm (8-Way Symmetry)</a></li>
+            <li><a href="#sec7" style="color: #2563eb; text-decoration: none;">Algorithm 5: Cohen-Sutherland Line Clipping Algorithm</a></li>
+            <li><a href="#sec8" style="color: #2563eb; text-decoration: none;">Algorithm 6: Sutherland-Hodgman Polygon Clipping Algorithm (All 4 Conditions)</a></li>
+            <li><a href="#sec9" style="color: #2563eb; text-decoration: none;">Comprehensive Algorithm Comparison</a></li>
+            <li><a href="#sec10" style="color: #2563eb; text-decoration: none;">Compilation, Build Process & User Manual</a></li>
+        </ol>
+
+        <!-- Section 1 -->
+        <h2 id="sec1">1. Project Overview & System Architecture</h2>
+        <p>The <strong>Graphical Algorithm Visualizer</strong> is a high-performance educational desktop application developed in C. It bridges theoretical computer graphics mathematics with real-time, interactive raster graphics animations.</p>
+        <p>Unlike standard static plotting software, this visualizer demonstrates how the CPU decides which pixel to illuminate on each discrete iteration, providing side-by-side mathematical telemetry (step counter, decision parameter updates, candidate pixel coordinates, and geometric status).</p>
+        
+        <div class="callout callout-info">
+            <strong>System Highlights:</strong>
+            <ul>
+                <li><strong>Native Windows Compilation:</strong> Uses MinGW-w64 with the 64-bit WinBGIm port, compiling down to a standalone native binary without external runtime bloat.</li>
+                <li><strong>Split-Screen Layout:</strong> Left viewport ($800 \times 700$ px) hosts the Cartesian mathematical plane; Right viewport ($200 \times 700$ px) renders a real-time telemetry HUD displaying equations and step-by-step decision metrics.</li>
+                <li><strong>Interactive Speed Control:</strong> Configurable frame pacing (Slow: 200ms, Medium: 50ms, Fast: 10ms) allows students to observe individual step decisions or run full benchmarks.</li>
+            </ul>
+        </div>
+
+        <!-- Section 2 -->
+        <h2 id="sec2">2. Coordinate Mapping & Negative Point Handling</h2>
+        <p>Computer screen memory is conventionally addressed with $(0,0)$ at the top-left corner, where $Y$ increases downwards. Standard mathematical graphs, however, place $(0,0)$ in the center with $+Y$ pointing upward. The visualizer bridges this using mathematical transformation functions:</p>
+
+        <pre><code>// Coordinate Mapping Equations
+int toScreenX(int x) { 
+    return ORIGIN_X + x;       // ORIGIN_X = 400
+}
+int toScreenY(int y) { 
+    return ORIGIN_Y - y;       // ORIGIN_Y = 350 (Inverts mathematical Y to screen Y)
+}</code></pre>
+
+        <h4>Negative Coordinate & Input Protection:</h4>
+        <ul>
+            <li><strong>Minus-Sign Input Handling:</strong> The custom GUI input engine (<code>getGraphicalInput</code>) supports typing the minus sign (<code>-</code>) at the start of any coordinate or toggling it dynamically, enabling full 4-quadrant inputs.</li>
+            <li><strong>Panel Boundary Guard:</strong> Pixel plotting verifies that $2 \le x_{screen} \le 798$ and $2 \le y_{screen} \le 698$, guaranteeing that extreme or negative coordinates never bleed into the right-hand Info Panel.</li>
+        </ul>
+
+        <!-- Section 3 -->
+        <div class="page-break"></div>
+        <h2 id="sec3">3. Algorithm 1: DDA (Digital Differential Analyzer) Line Algorithm</h2>
+        <p>The DDA algorithm calculates pixel locations along a straight line by taking unit steps in one coordinate and calculating corresponding fractional increments in the other based on the differential equation $\frac{dy}{dx} = m$.</p>
+
+        <h3>Mathematical Formula</h3>
+        <ol>
+            <li>Compute span differences: $\Delta x = x_2 - x_1$ and $\Delta y = y_2 - y_1$.</li>
+            <li>Determine step count: $steps = \max(|\Delta x|, |\Delta y|)$.</li>
+            <li>Calculate unit increments:
+                $$x_{inc} = \frac{\Delta x}{steps}, \quad y_{inc} = \frac{\Delta y}{steps}$$
+            </li>
+            <li>Plot successive pixels iteratively: $(x_{k+1}, y_{k+1}) = (x_k + x_{inc}, y_k + y_{inc})$ rounded to nearest integer:
+                $$x_{pixel} = \text{round}(x), \quad y_{pixel} = \text{round}(y)$$
+            </li>
+        </ol>
+
+        <div class="callout callout-warning">
+            <strong>Evaluation:</strong> DDA is mathematically straightforward, but requires floating-point additions and a <code>round()</code> operation at every pixel, making it computationally slower in pure software rasterizers compared to integer-only algorithms.
+        </div>
+
+        <!-- Section 4 -->
+        <h2 id="sec4">4. Algorithm 2: Bresenham's Line Algorithm</h2>
+        <p>Bresenham's algorithm eliminates all floating-point math and divisions by reformulating line drawing into purely integer additions, subtractions, and bitwise shifts.</p>
+
+        <h3>Mathematical Derivation</h3>
+        <p>For a line with gentle positive slope ($0 < m \le 1$), the major axis is $X$. At each step, $x$ increments by 1, and the algorithm decides between the East pixel $(x_k+1, y_k)$ and the North-East pixel $(x_k+1, y_k+1)$.</p>
+        <p>The decision parameter $p_k$ is derived from the difference between the vertical distances $d_1$ and $d_2$ from the true mathematical line to the lower and upper pixel centers:</p>
+        
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Decision Condition</th>
+                    <th>Selected Pixel</th>
+                    <th>Next Decision Parameter Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Initial Step:</strong> $k = 0$</td>
+                    <td>$(x_1, y_1)$</td>
+                    <td>$p_0 = 2\Delta y - \Delta x$</td>
+                </tr>
+                <tr>
+                    <td><strong>If $p_k < 0$:</strong> Midpoint is above the true line</td>
+                    <td>Choose <strong>East</strong>: $(x_k + 1, y_k)$</td>
+                    <td>$p_{k+1} = p_k + 2\Delta y$</td>
+                </tr>
+                <tr>
+                    <td><strong>If $p_k \ge 0$:</strong> Midpoint is on or below the true line</td>
+                    <td>Choose <strong>North-East</strong>: $(x_k + 1, y_k + 1)$</td>
+                    <td>$p_{k+1} = p_k + 2\Delta y - 2\Delta x$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Section 5 -->
+        <div class="page-break"></div>
+        <h2 id="sec5">5. Algorithm 3: Midpoint Line Algorithm (All 6 Slope Conditions)</h2>
+        <p>The Midpoint Line Drawing Algorithm is based on evaluating the line's implicit equation $F(x, y) = ax + by + c = 0$ (where $a = \Delta y, b = -\Delta x, c = x_1 y_2 - x_2 y_1$) at the exact midpoint $M$ between candidate pixels.</p>
+
+        <p>The visualizer comprehensively satisfies <strong>all 6 geometric slope conditions</strong>:</p>
+
+        <div class="condition-grid">
+            <div class="condition-card">
+                <h5><span class="badge" style="background:#2563eb;">Condition 1</span> Gentle Positive Slope ($0 < m \le 1$)</h5>
+                <p><strong>Step:</strong> $x$ increments by $+1$. Candidate pixels are East $(x+1, y)$ and North-East $(x+1, y+1)$.</p>
+                <p><strong>Initial:</strong> $d_0 = 2\Delta y - \Delta x$</p>
+                <p>• If $d \le 0$: Choose East, $d = d + 2\Delta y$<br>
+                   • If $d > 0$: Choose North-East, $y = y + 1$, $d = d + 2(\Delta y - \Delta x)$</p>
+            </div>
+
+            <div class="condition-card">
+                <h5><span class="badge" style="background:#0d9488;">Condition 2</span> Gentle Negative Slope ($-1 \le m < 0$)</h5>
+                <p><strong>Step:</strong> $x$ increments by $+1$. Candidate pixels are East $(x+1, y)$ and South-East $(x+1, y-1)$.</p>
+                <p><strong>Initial:</strong> $d_0 = 2|\Delta y| - \Delta x$</p>
+                <p>• If $d \le 0$: Choose East, $d = d + 2|\Delta y|$<br>
+                   • If $d > 0$: Choose South-East, $y = y - 1$, $d = d + 2(|\Delta y| - \Delta x)$</p>
+            </div>
+
+            <div class="condition-card">
+                <h5><span class="badge" style="background:#7c3aed;">Condition 3</span> Steep Positive Slope ($m > 1$)</h5>
+                <p><strong>Step:</strong> Major axis is $Y$. $y$ increments by $+1$. Candidate pixels are North $(x, y+1)$ and North-East $(x+1, y+1)$.</p>
+                <p><strong>Initial:</strong> $d_0 = 2\Delta x - \Delta y$</p>
+                <p>• If $d \le 0$: Choose North, $d = d + 2\Delta x$<br>
+                   • If $d > 0$: Choose North-East, $x = x + 1$, $d = d + 2(\Delta x - \Delta y)$</p>
+            </div>
+
+            <div class="condition-card">
+                <h5><span class="badge" style="background:#db2777;">Condition 4</span> Steep Negative Slope ($m < -1$)</h5>
+                <p><strong>Step:</strong> Major axis is $Y$. $y$ decrements by $-1$. Candidate pixels are South $(x, y-1)$ and South-East $(x+1, y-1)$.</p>
+                <p><strong>Initial:</strong> $d_0 = 2\Delta x - |\Delta y|$</p>
+                <p>• If $d \le 0$: Choose South, $d = d + 2\Delta x$<br>
+                   • If $d > 0$: Choose South-East, $x = x + 1$, $d = d + 2(\Delta x - |\Delta y|)$</p>
+            </div>
+
+            <div class="condition-card">
+                <h5><span class="badge" style="background:#475569;">Condition 5</span> Horizontal Line ($m = 0, \Delta y = 0$)</h5>
+                <p>Direct stepping along $X$ axis from $x_1$ to $x_2$ with $y$ held constant. Zero decision parameter evaluation needed.</p>
+            </div>
+
+            <div class="condition-card">
+                <h5><span class="badge" style="background:#475569;">Condition 6</span> Vertical Line ($\Delta x = 0$)</h5>
+                <p>Direct stepping along $Y$ axis from $y_1$ to $y_2$ with $x$ held constant. Avoids division-by-zero slope errors completely.</p>
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="page-break"></div>
+        <h2 id="sec6">6. Algorithm 4: Midpoint Circle Drawing Algorithm (8-Way Symmetry)</h2>
+        <p>The Midpoint Circle Algorithm evaluates the implicit circle equation $F(x, y) = x^2 + y^2 - R^2 = 0$. By taking advantage of the circle's <strong>eight-fold symmetry</strong>, the algorithm only computes pixel coordinates for a single octant ($x \le y$, where the tangent slope varies from $0$ to $-1$), reflecting every point across all 8 octants simultaneously.</p>
+
+        <h3>8-Way Symmetric Reflections</h3>
+        <p>For any point $(x, y)$ computed on the circle perimeter relative to center $(x_c, y_c)$, 8 pixels are plotted at once:</p>
+        <pre><code>plotCirclePoints(xc, yc, x, y):
+  Plot(xc + x, yc + y)    Plot(xc - x, yc + y)
+  Plot(xc + x, yc - y)    Plot(xc - x, yc - y)
+  Plot(xc + y, yc + x)    Plot(xc - y, yc + x)
+  Plot(xc + y, yc - x)    Plot(xc - y, yc - x)</code></pre>
+
+        <h3>Decision Parameter Derivation</h3>
+        <ol>
+            <li>Starting point at top of circle: $(x_0, y_0) = (0, R)$.</li>
+            <li>Midpoint between candidate pixels $E(1, R)$ and $SE(1, R - 1)$ is $M\left(1, R - \frac{1}{2}\right)$.</li>
+            <li>Evaluate implicit function at $M$:
+                $$d_0 = F\left(1, R - \frac{1}{2}\right) = 1^2 + \left(R - \frac{1}{2}\right)^2 - R^2 = 1 + R^2 - R + \frac{1}{4} - R^2 = \frac{5}{4} - R$$
+            </li>
+            <li>Since $R$ is an integer, rounding $\frac{5}{4}$ gives the standard integer initialization:
+                $$\mathbf{d_0 = 1 - R}$$
+            </li>
+        </ol>
+
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Decision Parameter Test</th>
+                    <th>Pixel Selected</th>
+                    <th>Coordinate Update</th>
+                    <th>Parameter Increment</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>If $d_k < 0$:</strong> Midpoint inside circle</td>
+                    <td>Choose <strong>East</strong></td>
+                    <td>$x = x + 1, \quad y = y$</td>
+                    <td>$d_{k+1} = d_k + 2x + 3$</td>
+                </tr>
+                <tr>
+                    <td><strong>If $d_k \ge 0$:</strong> Midpoint outside or on circle</td>
+                    <td>Choose <strong>South-East</strong></td>
+                    <td>$x = x + 1, \quad y = y - 1$</td>
+                    <td>$d_{k+1} = d_k + 2(x - y) + 5$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Section 7 -->
+        <div class="page-break"></div>
+        <h2 id="sec7">7. Algorithm 5: Cohen-Sutherland Line Clipping Algorithm</h2>
+        <p>The Cohen-Sutherland algorithm divides 2D space into 9 regions relative to a rectangular clipping window $[X_{min}, X_{max}] \times [Y_{min}, Y_{max}]$. Every point is assigned a 4-bit Outcode: <code>[TOP, BOTTOM, RIGHT, LEFT]</code>.</p>
+
+        <table style="width: 100%; text-align: center;">
+            <thead>
+                <tr>
+                    <th>1001 (Top-Left)</th>
+                    <th>1000 (Top-Center)</th>
+                    <th>1010 (Top-Right)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>0001 (Left)</strong></td>
+                    <td style="background-color: #f0fdf4; font-weight: bold; color: #166534;">0000 (CLIP WINDOW)</td>
+                    <td><strong>0010 (Right)</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>0101 (Bottom-Left)</strong></td>
+                    <td><strong>0100 (Bottom-Center)</strong></td>
+                    <td><strong>0110 (Bottom-Right)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Evaluation Rules:</h4>
+        <ul>
+            <li><strong>Trivial Accept:</strong> <code>(outcode1 | outcode2) == 0</code>. Both endpoints are inside the window; the entire line is visible.</li>
+            <li><strong>Trivial Reject:</strong> <code>(outcode1 & outcode2) != 0</code>. Both endpoints share an outside half-plane; the line lies entirely outside the window.</li>
+            <li><strong>Clipping Required:</strong> If neither condition holds, pick the endpoint outside the window, find its intersection with the corresponding window boundary, and re-evaluate until trivial accept or reject is reached.</li>
+        </ul>
+
+        <!-- Section 8 -->
+        <div class="page-break"></div>
+        <h2 id="sec8">8. Algorithm 6: Sutherland-Hodgman Polygon Clipping Algorithm</h2>
+        <p>The <strong>Sutherland-Hodgman</strong> algorithm clips an arbitrary polygon against a convex clipping window. It processes the entire polygon iteratively through a <strong>4-Stage Boundary Pipeline</strong>:</p>
+
+        <div style="text-align: center; margin: 20px 0; padding: 15px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;">
+            <strong style="color: var(--primary); font-size: 15px;">Pipeline Execution Order:</strong><br>
+            <span style="font-weight: 600; font-size: 14px; color: #334155;">
+                Input Polygon &nbsp;➔&nbsp; 
+                <span style="color:#ef4444;">1. Left Edge ($x \ge X_{min}$)</span> &nbsp;➔&nbsp; 
+                <span style="color:#f59e0b;">2. Right Edge ($x \le X_{max}$)</span> &nbsp;➔&nbsp; 
+                <span style="color:#10b981;">3. Bottom Edge ($y \ge Y_{min}$)</span> &nbsp;➔&nbsp; 
+                <span style="color:#3b82f6;">4. Top Edge ($y \le Y_{max}$)</span> &nbsp;➔&nbsp; 
+                Final Clipped Polygon
+            </span>
+        </div>
+
+        <h3>All 4 Clipping Conditions Satisfied</h3>
+        <p>At each boundary stage, the algorithm traverses every directed polygon edge from vertex $V_1$ to vertex $V_2$ and tests which of the four conditions is triggered:</p>
+
+        <div class="condition-grid">
+            <div class="condition-card" style="border-top: 3px solid #10b981;">
+                <h5><span class="badge badge-case1">Case 1</span> IN ➔ IN (Both Inside)</h5>
+                <p>Both vertices $V_1$ and $V_2$ lie inside the clipping boundary.</p>
+                <p><strong>Action:</strong> Save vertex <strong>$V_2$</strong> to the output list.</p>
+                <div class="callout callout-success" style="margin: 8px 0; padding: 8px 12px;">
+                    <code>outPoly[outCount++] = V2;</code>
+                </div>
+            </div>
+
+            <div class="condition-card" style="border-top: 3px solid #f59e0b;">
+                <h5><span class="badge badge-case2">Case 2</span> IN ➔ OUT (Exiting Boundary)</h5>
+                <p>Vertex $V_1$ is inside, but vertex $V_2$ is outside the boundary.</p>
+                <p><strong>Action:</strong> Calculate intersection point <strong>$V'$</strong> and save <strong>$V'$</strong> to output.</p>
+                <div class="callout callout-warning" style="margin: 8px 0; padding: 8px 12px;">
+                    <code>V' = intersectEdge(V1, V2); outPoly[outCount++] = V';</code>
+                </div>
+            </div>
+
+            <div class="condition-card" style="border-top: 3px solid #64748b;">
+                <h5><span class="badge badge-case3">Case 3</span> OUT ➔ OUT (Both Outside)</h5>
+                <p>Both vertices $V_1$ and $V_2$ lie outside the clipping boundary.</p>
+                <p><strong>Action:</strong> <strong>Discard</strong> both vertices; nothing is saved to the output list.</p>
+                <div class="callout callout-info" style="margin: 8px 0; padding: 8px 12px; background:#f1f5f9; border-color:#94a3b8; color:#475569;">
+                    <code>// No vertices saved to output list</code>
+                </div>
+            </div>
+
+            <div class="condition-card" style="border-top: 3px solid #3b82f6;">
+                <h5><span class="badge badge-case4">Case 4</span> OUT ➔ IN (Entering Boundary)</h5>
+                <p>Vertex $V_1$ is outside, but vertex $V_2$ is inside the boundary.</p>
+                <p><strong>Action:</strong> Calculate intersection <strong>$V'$</strong>, save <strong>$V'$</strong>, then save <strong>$V_2$</strong>.</p>
+                <div class="callout callout-primary" style="margin: 8px 0; padding: 8px 12px;">
+                    <code>V' = intersectEdge(V1, V2); outPoly[outCount++] = V'; outPoly[outCount++] = V2;</code>
+                </div>
+            </div>
+        </div>
+
+        <h3>Boundary Intersection Equations</h3>
+        <p>Given directed line segment from $V_1(x_1, y_1)$ to $V_2(x_2, y_2)$ with $\Delta x = x_2 - x_1$ and $\Delta y = y_2 - y_1$:</p>
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Clipping Boundary</th>
+                    <th>Fixed Coordinate</th>
+                    <th>Calculated Intersection Coordinate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Left Edge</strong> ($x = X_{min}$)</td>
+                    <td>$x_{int} = X_{min}$</td>
+                    <td>$y_{int} = y_1 + \Delta y \cdot \frac{X_{min} - x_1}{\Delta x}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Right Edge</strong> ($x = X_{max}$)</td>
+                    <td>$x_{int} = X_{max}$</td>
+                    <td>$y_{int} = y_1 + \Delta y \cdot \frac{X_{max} - x_1}{\Delta x}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Bottom Edge</strong> ($y = Y_{min}$)</td>
+                    <td>$y_{int} = Y_{min}$</td>
+                    <td>$x_{int} = x_1 + \Delta x \cdot \frac{Y_{min} - y_1}{\Delta y}$</td>
+                </tr>
+                <tr>
+                    <td><strong>Top Edge</strong> ($y = Y_{max}$)</td>
+                    <td>$y_{int} = Y_{max}$</td>
+                    <td>$x_{int} = x_1 + \Delta x \cdot \frac{Y_{max} - y_1}{\Delta y}$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Section 9 -->
+        <div class="page-break"></div>
+        <h2 id="sec9">9. Comprehensive Algorithm Comparison</h2>
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Algorithm</th>
+                    <th>Category</th>
+                    <th>Arithmetic</th>
+                    <th>Time Complexity</th>
+                    <th>Key Distinction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>DDA Line</strong></td>
+                    <td>Line Rasterization</td>
+                    <td>Floating-point additions</td>
+                    <td>$O(\max(\Delta x, \Delta y))$</td>
+                    <td>Simple differential approach, requires rounding per step</td>
+                </tr>
+                <tr>
+                    <td><strong>Bresenham Line</strong></td>
+                    <td>Line Rasterization</td>
+                    <td>Pure integer arithmetic</td>
+                    <td>$O(\max(\Delta x, \Delta y))$</td>
+                    <td>Error accumulation term; highly optimal for hardware</td>
+                </tr>
+                <tr>
+                    <td><strong>Midpoint Line</strong></td>
+                    <td>Line Rasterization</td>
+                    <td>Pure integer arithmetic</td>
+                    <td>$O(\max(\Delta x, \Delta y))$</td>
+                    <td>Evaluates implicit equation at midpoints across all 6 slopes</td>
+                </tr>
+                <tr>
+                    <td><strong>Midpoint Circle</strong></td>
+                    <td>Circle Rasterization</td>
+                    <td>Pure integer arithmetic</td>
+                    <td>$O(R)$</td>
+                    <td>8-way symmetric reflection computing only $45^\circ$ octant</td>
+                </tr>
+                <tr>
+                    <td><strong>Cohen-Sutherland</strong></td>
+                    <td>Line Clipping</td>
+                    <td>Bitwise codes + Float math</td>
+                    <td>$O(1)$ amortized</td>
+                    <td>Fast trivial rejection/acceptance using 4-bit region outcodes</td>
+                </tr>
+                <tr>
+                    <td><strong>Sutherland-Hodgman</strong></td>
+                    <td>Polygon Clipping</td>
+                    <td>Float intersections</td>
+                    <td>$O(V \cdot E_{win})$</td>
+                    <td>Sequential 4-stage pipeline producing closed clipped polygons</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Section 10 -->
+        <h2 id="sec10">10. Compilation, Build Process & User Manual</h2>
+        <p>The project contains automated build scripts for Windows command prompt and PowerShell.</p>
+
+        <h3>Compilation Commands</h3>
+        <pre><code># Quick 1-Click Batch Build (auto-kills previous instance and runs visualizer.exe)
+.\build.bat
+
+# Manual G++ Compilation Command:
+g++ main.c -o visualizer.exe -I. -L. -lbgi -lgdi32 -lcomdlg32 -luuid -loleaut32 -lole32 -fpermissive</code></pre>
+
+        <h3>Interactive Menu Controls</h3>
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Feature</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>DDA Line Drawing</td>
+                    <td>Plots line using differential increments.</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td>Bresenham Line Drawing</td>
+                    <td>Plots line using integer error tracking.</td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td>Midpoint Line Drawing</td>
+                    <td>Full support for slope $>0$, slope $<0$, steep lines, and axes.</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td>Midpoint Circle Drawing</td>
+                    <td>Plots circle using 8-way symmetry around any $(x_c, y_c)$.</td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td>Cohen-Sutherland Clipping</td>
+                    <td>Clips 2D line against rectangular window.</td>
+                </tr>
+                <tr>
+                    <td><strong>6</strong></td>
+                    <td>Sutherland-Hodgman Clipping</td>
+                    <td>Features 3 Presets (Triangle, Quad, Arrow) and Custom $N$-gon input.</td>
+                </tr>
+                <tr>
+                    <td><strong>7</strong></td>
+                    <td>Compare Algorithms</td>
+                    <td>Displays side-by-side feature comparison table.</td>
+                </tr>
+                <tr>
+                    <td><strong>8</strong></td>
+                    <td>Algorithm Information</td>
+                    <td>Detailed theoretical slides for algorithms 1 through 6.</td>
+                </tr>
+                <tr>
+                    <td><strong>S</strong></td>
+                    <td>Set Animation Speed</td>
+                    <td>Toggles animation delays (Slow 200ms, Medium 50ms, Fast 10ms).</td>
+                </tr>
+                <tr>
+                    <td><strong>0</strong></td>
+                    <td>Exit</td>
+                    <td>Safely closes graphics window and exits application.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Graphics Algorithm Visualizer</strong> — Educational Computer Graphics Project</p>
+            <p>To print this report as a PDF, click the <strong>"Save as PDF / Print"</strong> button at the top or press <code>Ctrl + P</code> in your browser.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>

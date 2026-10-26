@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphical Algorithm Visualizer | Web App</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #111827;
+            --bg-panel: #162032;
+            --border: #1f293d;
+            --border-hover: #374151;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.25);
+            --accent-green: #10b981;
+            --accent-purple: #a855f7;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-cyan: #06b6d4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Header Navbar */
+        header {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text p {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-link {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-link:hover {
+            color: var(--text-main);
+            border-color: var(--border-hover);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .btn-link.active {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: var(--primary-glow);
+        }
+
+        /* Algorithm Selector Bar */
+        .algo-tabs-bar {
+            background: #0d131f;
+            border-bottom: 1px solid var(--border);
+            padding: 8px 24px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .algo-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .algo-tab:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .algo-tab.active {
+            background: var(--bg-card);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
+        }
+
+        .algo-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-muted);
+        }
+
+        .algo-tab.active .algo-badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--primary);
+        }
+
+        /* Main Workspace Layout */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            flex: 1;
+            height: calc(100vh - 110px);
+        }
+
+        /* Canvas Area */
+        .canvas-area {
+            position: relative;
+            background: #080c14;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .canvas-toolbar {
+            padding: 10px 18px;
+            background: rgba(17, 24, 39, 0.7);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .canvas-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            background: #080c14;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* Side Telemetry & Controls Panel */
+        .side-panel {
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Input Controls */
+        .inputs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: #0b111d;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-main);
+            padding: 8px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-glow);
+        }
+
+        /* Preset Buttons */
+        .presets-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .btn-preset {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-preset:hover {
+            color: var(--text-main);
+            border-color: var(--primary);
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #0284c7, #0284c7);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #0369a1;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--border-hover);
+        }
+
+        /* Speed Control */
+        .speed-control {
+            margin-top: 14px;
+        }
+
+        .speed-slider {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .speed-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Live Telemetry Display */
+        .telemetry-card {
+            background: #0a0f1c;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .tele-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .tele-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .tele-label {
+            color: var(--text-muted);
+        }
+
+        .tele-val {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .tele-highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .tele-status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        /* Explanation Box */
+        .algo-info-box {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.55;
+            background: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        /* Modals (Comparison & About Project) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 820px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: white;
+            background: rgba(255,255,255,0.12);
+        }
+
+        /* Table inside modal */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-table th {
+            background: #1e293b;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .comparison-table tr:nth-child(even) td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .tag-integer {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tag-float {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-rose);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* About Project Cards */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .student-card {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .student-name {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .student-uucms {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        /* Responsive layout */
+        @media (max-width: 900px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .canvas-container {
+                height: 480px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">✦</div>
+            <div class="brand-text">
+                <h1>Graphics Algorithm Visualizer</h1>
+                <p>Computer Graphics & Visualization Educational Platform</p>
+            </div>
+        </div>
+        <div class="nav-links">
+            <button class="btn-link" onclick="openModal('modalComparison')">📊 Comparison Table</button>
+            <button class="btn-link" onclick="openModal('modalAbout')">👥 About Project</button>
+            <a href="project_report.html" target="_blank" class="btn-link" style="color: var(--accent-green); border-color: rgba(16,185,129,0.3);">📄 Project Report (PDF)</a>
+        </div>
+    </header>
+
+    <!-- Algorithm Tabs Bar -->
+    <div class="algo-tabs-bar">
+        <button class="algo-tab active" onclick="switchAlgorithm('dda')">
+            <span>DDA Line</span>
+            <span class="algo-badge">1</span>
+        </button>
+        <button class="algo-tab" onclick="switchAlgorithm('bresenham')">
+            <span>Bresenham Line</span>
+            <span class="algo-badge">2</span>
+        </button>
+        <button class="algo-tab" onclick="switchAlgorithm('midpointLine')">
+            <span>Midpoint Line</span>
+            <span class="algo-badge">3</span>
+        </button>
+        <button class="algo-tab" onclick="switchAlgorithm('midpointCircle')">
+            <span>Midpoint Circle</span>
+            <span class="algo-badge">4</span>
+        </button>
+        <button class="algo-tab" onclick="switchAlgorithm('cohenSutherland')">
+            <span>Cohen-Sutherland</span>
+            <span class="algo-badge">5</span>
+        </button>
+        <button class="algo-tab" onclick="switchAlgorithm('sutherlandHodgman')">
+            <span>Sutherland-Hodgman</span>
+            <span class="algo-badge">6</span>
+        </button>
+    </div>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+
+        <!-- Canvas Viewport -->
+        <div class="canvas-area">
+            <div class="canvas-toolbar">
+                <div class="canvas-title" id="canvasTitle">✦ DDA Line Drawing Algorithm</div>
+                <div style="font-size: 11.5px; color: var(--text-muted);">Cartesian Origin (0,0) Centered • Grid: 1 Grid = 10 Units</div>
+            </div>
+            <div class="canvas-container" id="canvasContainer">
+                <canvas id="glCanvas" width="760" height="560"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Side HUD & Controls -->
+        <div class="side-panel">
+            
+            <!-- Controls Section -->
+            <div class="panel-section">
+                <div class="section-title">Inputs & Coordinates</div>
+                
+                <!-- Dynamic Input Container -->
+                <div id="dynamicInputs"></div>
+
+                <!-- Presets Row -->
+                <div class="presets-row" id="presetsRow"></div>
+
+                <!-- Action Buttons -->
+                <div class="action-btns">
+                    <button class="btn-primary" id="btnPlayPause" onclick="togglePlayPause()">
+                        <span id="playIcon">▶</span> <span id="playText">Animate</span>
+                    </button>
+                    <button class="btn-secondary" onclick="stepForward()">Step ❯</button>
+                    <button class="btn-secondary" onclick="resetAnimation()">↺ Reset</button>
+                </div>
+
+                <!-- Animation Speed -->
+                <div class="speed-control">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:4px;">
+                        <span style="color:var(--text-muted);">Animation Speed:</span>
+                        <span id="speedVal" style="color:var(--primary); font-weight:700;">Medium (50ms)</span>
+                    </div>
+                    <input type="range" min="10" max="250" value="50" class="speed-slider" id="speedSlider" oninput="updateSpeed(this.value)">
+                    <div class="speed-labels">
+                        <span>Fast (10ms)</span>
+                        <span>Medium (50ms)</span>
+                        <span>Slow (250ms)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Telemetry Section -->
+            <div class="panel-section">
+                <div class="section-title">
+                    <span>Live Step Telemetry</span>
+                    <span class="tele-status-tag" id="statusTag">Ready</span>
+                </div>
+
+                <div class="telemetry-card" id="telemetryCard">
+                    <div class="tele-row">
+                        <span class="tele-label">Current Step:</span>
+                        <span class="tele-val tele-highlight" id="teleStep">0</span>
+                    </div>
+                    <div class="tele-row">
+                        <span class="tele-label">Plot Coordinates:</span>
+                        <span class="tele-val" id="teleCoords">(0, 0)</span>
+                    </div>
+                    <div class="tele-row" id="teleParamRow">
+                        <span class="tele-label">Decision Param:</span>
+                        <span class="tele-val" id="teleParam">d = 0</span>
+                    </div>
+                    <div class="tele-row" id="teleConditionRow">
+                        <span class="tele-label">Condition:</span>
+                        <span class="tele-val" id="teleCondition">Initialized</span>
+                    </div>
+                    <div class="tele-row" id="teleActionRow">
+                        <span class="tele-label">Action Taken:</span>
+                        <span class="tele-val tele-highlight" id="teleAction">Awaiting Start</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Algorithm Explanation Box -->
+            <div class="panel-section" style="flex:1;">
+                <div class="section-title">Algorithm Notes</div>
+                <div class="algo-info-box" id="algoExplanation"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal 1: Algorithm Comparison Table -->
+    <div class="modal-overlay" id="modalComparison">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modalComparison')">✕</button>
+            <h2 style="font-size:20px; color:var(--primary); margin-bottom:6px;">Algorithm Comparison Table</h2>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Side-by-side technical evaluation of all implemented algorithms.</p>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Category</th>
+                        <th>Arithmetic Type</th>
+                        <th>Time Complexity</th>
+                        <th>Key Features</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>DDA Line</strong></td>
+                        <td>Line Drawing</td>
+                        <td><span class="tag-float">Floating-Point</span></td>
+                        <td>O(max(Δx, Δy))</td>
+                        <td>Differential step, requires round() per pixel</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bresenham Line</strong></td>
+                        <td>Line Drawing</td>
+                        <td><span class="tag-integer">Pure Integer</span></td>
+                        <td>O(max(Δx, Δy))</td>
+                        <td>Integer error tracking (p = 2Δy - Δx), hardware fast</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Midpoint Line</strong></td>
+                        <td>Line Drawing</td>
+                        <td><span class="tag-integer">Pure Integer</span></td>
+                        <td>O(max(Δx, Δy))</td>
+                        <td>Evaluates implicit equation at midpoints across all 6 slopes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Midpoint Circle</strong></td>
+                        <td>Circle Drawing</td>
+                        <td><span class="tag-integer">Pure Integer</span></td>
+                        <td>O(R)</td>
+                        <td>8-Way symmetry, calculates 1 octant and reflects all 8</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cohen-Sutherland</strong></td>
+                        <td>Line Clipping</td>
+                        <td><span class="tag-float">Bitwise & Float</span></td>
+                        <td>O(1) amortized</td>
+                        <td>4-Bit region outcodes, fast trivial accept/reject</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sutherland-Hodgman</strong></td>
+                        <td>Polygon Clipping</td>
+                        <td><span class="tag-float">Float Intersect</span></td>
+                        <td>O(V · E)</td>
+                        <td>4-Stage boundary pipeline, all 4 conditions (IN/OUT)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal 2: About Project -->
+    <div class="modal-overlay" id="modalAbout">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modalAbout')">✕</button>
+            <h2 style="font-size:22px; color:var(--primary); margin-bottom:4px;">About Project</h2>
+            <h3 style="font-size:15px; color:#cbd5e1; margin-bottom:15px;">Graphical Algorithm Visualizer</h3>
+            
+            <div style="background:#0b111d; border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:20px; font-size:13.5px; line-height:1.8;">
+                <div><strong style="color:var(--primary);">Department:</strong> MCA Department</div>
+                <div><strong style="color:var(--primary);">Project Guide:</strong> Dr. Ravikumar Roogi</div>
+                <div><strong style="color:var(--primary);">Academic Year:</strong> 2025 - 2027</div>
+                <div><strong style="color:var(--primary);">Subject:</strong> Computer Graphics & Visualization</div>
+            </div>
+
+            <h4 style="font-size:14px; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.5px;">Project Team Members (Students)</h4>
+            <div class="team-grid">
+                <div class="student-card">
+                    <div class="student-name">1. Chaitra N</div>
+                    <div class="student-uucms">UUCMS: PO2DR25S126006</div>
+                </div>
+                <div class="student-card">
+                    <div class="student-name">2. Vasanta M</div>
+                    <div class="student-uucms">UUCMS: PO2DR25S126038</div>
+                </div>
+                <div class="student-card">
+                    <div class="student-name">3. Ananya S</div>
+                    <div class="student-uucms">UUCMS: PO2DR25S126002</div>
+                </div>
+                <div class="student-card">
+                    <div class="student-name">4. Riya N</div>
+                    <div class="student-uucms">UUCMS: PO2DR25S126023</div>
+                </div>
+                <div class="student-card">
+                    <div class="student-name">5. Misba M</div>
+                    <div class="student-uucms">UUCMS: P02DR25S126015</div>
+                </div>
+                <div class="student-card">
+                    <div class="student-name">6. Iranna K</div>
+                    <div class="student-uucms">UUCMS: P02DR25S126010</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic (Pure JavaScript) -->
+    <script>
+        const canvas = document.getElementById('glCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let currentAlgo = 'dda';
+        let animationTimer = null;
+        let isRunning = false;
+        let animSpeed = 50;
+        let stepGenerator = null;
+        let lastState = null;
+
+        // Origin mapping: 0,0 is at canvas center
+        const ORIGIN_X = 380;
+        const ORIGIN_Y = 280;
+        const GRID_SIZE = 12; // pixels per unit
+
+        function toScreenX(x) { return ORIGIN_X + x * 2; }
+        function toScreenY(y) { return ORIGIN_Y - y * 2; }
+
+        // Clear and draw Cartesian axes
+        function drawGrid() {
+            ctx.fillStyle = '#080c14';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Subtle grid
+            ctx.strokeStyle = '#111827';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 20) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 20) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(0, ORIGIN_Y); ctx.lineTo(canvas.width, ORIGIN_Y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ORIGIN_X, 0); ctx.lineTo(ORIGIN_X, canvas.height); ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#64748b';
+            ctx.font = '10px JetBrains Mono';
+            ctx.fillText('+X', canvas.width - 25, ORIGIN_Y - 8);
+            ctx.fillText('-X', 10, ORIGIN_Y - 8);
+            ctx.fillText('+Y', ORIGIN_X + 8, 20);
+            ctx.fillText('-Y', ORIGIN_X + 8, canvas.height - 15);
+            ctx.fillText('(0,0)', ORIGIN_X - 35, ORIGIN_Y + 16);
+        }
+
+        function plotPixel(x, y, color = '#38bdf8', size = 4) {
+            const sx = toScreenX(x);
+            const sy = toScreenY(y);
+            ctx.fillStyle = color;
+            ctx.fillRect(sx - size/2, sy - size/2, size, size);
+        }
+
+        // --- Algorithm Generators ---
+
+        // 1. DDA Line
+        function* ddaGenerator(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const steps = Math.max(Math.abs(dx), Math.abs(dy));
+            const xInc = steps === 0 ? 0 : dx / steps;
+            const yInc = steps === 0 ? 0 : dy / steps;
+
+            let x = x1;
+            let y = y1;
+
+            for (let i = 0; i <= steps; i++) {
+                const px = Math.round(x);
+                const py = Math.round(y);
+                plotPixel(px, py, '#38bdf8', 5);
+                yield {
+                    step: i,
+                    coords: `(${px}, ${py})`,
+                    param: `steps = ${steps}, inc=(${xInc.toFixed(2)}, ${yInc.toFixed(2)})`,
+                    condition: `i <= steps (${i}/${steps})`,
+                    action: `Plot round(${x.toFixed(1)}, ${y.toFixed(1)})`
+                };
+                x += xInc;
+                y += yInc;
+            }
+        }
+
+        // 2. Bresenham Line
+        function* bresenhamGenerator(x1, y1, x2, y2) {
+            let x = x1;
+            let y = y1;
+            const dx = Math.abs(x2 - x1);
+            const dy = Math.abs(y2 - y1);
+            const sx = x1 < x2 ? 1 : -1;
+            const sy = y1 < y2 ? 1 : -1;
+            let err = dx - dy;
+            let step = 0;
+
+            while (true) {
+                plotPixel(x, y, '#10b981', 5);
+                yield {
+                    step: step++,
+                    coords: `(${x}, ${y})`,
+                    param: `err = ${err}`,
+                    condition: `dx=${dx}, dy=${dy}`,
+                    action: `Plot (${x}, ${y})`
+                };
+
+                if (x === x2 && y === y2) break;
+                const e2 = 2 * err;
+                if (e2 > -dy) { err -= dy; x += sx; }
+                if (e2 < dx) { err += dx; y += sy; }
+            }
+        }
+
+        // 3. Midpoint Line (All 6 slopes)
+        function* midpointLineGenerator(x1, y1, x2, y2) {
+            let origX1 = x1, origY1 = y1, origX2 = x2, origY2 = y2;
+            if (x1 > x2) {
+                [x1, x2] = [x2, x1];
+                [y1, y2] = [y2, y1];
+            }
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            let x = x1, y = y1, step = 0;
+
+            if (dx === 0) { // Vertical
+                const yStart = Math.min(y1, y2), yEnd = Math.max(y1, y2);
+                for (let currY = yStart; currY <= yEnd; currY++) {
+                    plotPixel(x1, currY, '#ec4899', 5);
+                    yield { step: step++, coords: `(${x1}, ${currY})`, param: 'dx = 0', condition: 'Vertical Line', action: 'Plot Vertical Step' };
+                }
+                return;
+            }
+
+            if (dy >= 0 && dy <= dx) { // 0 < m <= 1
+                let d = 2 * dy - dx;
+                while (x <= x2) {
+                    plotPixel(x, y, '#ec4899', 5);
+                    yield { step: step++, coords: `(${x}, ${y})`, param: `d = ${d}`, condition: 'Slope 0 < m <= 1', action: d <= 0 ? 'Choose East (x++)' : 'Choose NE (x++, y++)' };
+                    if (d <= 0) d += 2 * dy;
+                    else { d += 2 * (dy - dx); y++; }
+                    x++;
+                }
+            } else if (dy < 0 && Math.abs(dy) <= dx) { // -1 <= m < 0
+                let absDy = Math.abs(dy);
+                let d = 2 * absDy - dx;
+                while (x <= x2) {
+                    plotPixel(x, y, '#ec4899', 5);
+                    yield { step: step++, coords: `(${x}, ${y})`, param: `d = ${d}`, condition: 'Slope -1 <= m < 0', action: d <= 0 ? 'Choose East (x++)' : 'Choose SE (x++, y--)' };
+                    if (d <= 0) d += 2 * absDy;
+                    else { d += 2 * (absDy - dx); y--; }
+                    x++;
+                }
+            } else if (dy > dx) { // m > 1
+                let d = 2 * dx - dy;
+                while (y <= y2) {
+                    plotPixel(x, y, '#ec4899', 5);
+                    yield { step: step++, coords: `(${x}, ${y})`, param: `d = ${d}`, condition: 'Steep Slope m > 1', action: d <= 0 ? 'Choose North (y++)' : 'Choose NE (x++, y++)' };
+                    if (d <= 0) d += 2 * dx;
+                    else { d += 2 * (dx - dy); x++; }
+                    y++;
+                }
+            } else { // m < -1
+                let absDy = Math.abs(dy);
+                let d = 2 * dx - absDy;
+                while (y >= y2) {
+                    plotPixel(x, y, '#ec4899', 5);
+                    yield { step: step++, coords: `(${x}, ${y})`, param: `d = ${d}`, condition: 'Steep Slope m < -1', action: d <= 0 ? 'Choose South (y--)' : 'Choose SE (x++, y--)' };
+                    if (d <= 0) d += 2 * dx;
+                    else { d += 2 * (dx - absDy); x++; }
+                    y--;
+                }
+            }
+        }
+
+        // 4. Midpoint Circle (8-way symmetry)
+        function* midpointCircleGenerator(xc, yc, r) {
+            let x = 0;
+            let y = r;
+            let d = 1 - r;
+            let step = 0;
+
+            function plot8Points(px, py) {
+                const pts = [
+                    [xc + px, yc + py], [xc - px, yc + py], [xc + px, yc - py], [xc - px, yc - py],
+                    [xc + py, yc + px], [xc - py, yc + px], [xc + py, yc - px], [xc - py, yc - px]
+                ];
+                pts.forEach(([pxx, pyy]) => plotPixel(pxx, pyy, '#06b6d4', 4));
+            }
+
+            plotPixel(xc, yc, '#ef4444', 6); // Center
+
+            while (x <= y) {
+                plot8Points(x, y);
+                yield {
+                    step: step++,
+                    coords: `Octant 1: (${x}, ${y})`,
+                    param: `d = ${d}`,
+                    condition: d < 0 ? 'd < 0 (Inside)' : 'd >= 0 (Outside)',
+                    action: d < 0 ? 'Choose East (x++), d += 2x+3' : 'Choose SE (x++, y--), d += 2(x-y)+5'
+                };
+
+                if (d < 0) {
+                    d += 2 * x + 3;
+                    x++;
+                } else {
+                    d += 2 * (x - y) + 5;
+                    x++;
+                    y--;
+                }
+            }
+        }
+
+        // 5. Cohen-Sutherland Line Clipping
+        function* cohenSutherlandGenerator(x1, y1, x2, y2, win) {
+            const INSIDE = 0, LEFT = 1, RIGHT = 2, BOTTOM = 4, TOP = 8;
+            function computeCode(x, y) {
+                let code = INSIDE;
+                if (x < win.xmin) code |= LEFT;
+                else if (x > win.xmax) code |= RIGHT;
+                if (y < win.ymin) code |= BOTTOM;
+                else if (y > win.ymax) code |= TOP;
+                return code;
+            }
+
+            // Draw window in Yellow
+            ctx.strokeStyle = '#eab308';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(toScreenX(win.xmin), toScreenY(win.ymax), (win.xmax - win.xmin) * 2, (win.ymax - win.ymin) * 2);
+
+            // Draw unclipped line in Dark Gray
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(toScreenX(x1), toScreenY(y1));
+            ctx.lineTo(toScreenX(x2), toScreenY(y2));
+            ctx.stroke();
+
+            let code1 = computeCode(x1, y1);
+            let code2 = computeCode(x2, y2);
+            let accept = false;
+            let step = 1;
+
+            while (true) {
+                yield {
+                    step: step++,
+                    coords: `P1:(${Math.round(x1)},${Math.round(y1)}) P2:(${Math.round(x2)},${Math.round(y2)})`,
+                    param: `Code1: ${code1.toString(2).padStart(4,'0')}, Code2: ${code2.toString(2).padStart(4,'0')}`,
+                    condition: (code1 | code2) === 0 ? 'Trivially Accepted' : ((code1 & code2) !== 0 ? 'Trivially Rejected' : 'Clipping Required'),
+                    action: (code1 | code2) === 0 ? 'Accept Line' : ((code1 & code2) !== 0 ? 'Reject Line' : 'Calculate Intersection')
+                };
+
+                if ((code1 | code2) === 0) {
+                    accept = true;
+                    break;
+                } else if ((code1 & code2) !== 0) {
+                    break;
+                } else {
+                    let codeOut = code1 !== 0 ? code1 : code2;
+                    let x, y;
+
+                    if (codeOut & TOP) {
+                        x = x1 + (x2 - x1) * (win.ymax - y1) / (y2 - y1);
+                        y = win.ymax;
+                    } else if (codeOut & BOTTOM) {
+                        x = x1 + (x2 - x1) * (win.ymin - y1) / (y2 - y1);
+                        y = win.ymin;
+                    } else if (codeOut & RIGHT) {
+                        y = y1 + (y2 - y1) * (win.xmax - x1) / (x2 - x1);
+                        x = win.xmax;
+                    } else if (codeOut & LEFT) {
+                        y = y1 + (y2 - y1) * (win.xmin - x1) / (x2 - x1);
+                        x = win.xmin;
+                    }
+
+                    if (codeOut === code1) {
+                        x1 = x; y1 = y;
+                        code1 = computeCode(x1, y1);
+                    } else {
+                        x2 = x; y2 = y;
+                        code2 = computeCode(x2, y2);
+                    }
+                }
+            }
+
+            if (accept) {
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(toScreenX(x1), toScreenY(y1));
+                ctx.lineTo(toScreenX(x2), toScreenY(y2));
+                ctx.stroke();
+            }
+        }
+
+        // 6. Sutherland-Hodgman Polygon Clipping (All 4 conditions)
+        function* sutherlandHodgmanGenerator(poly, win) {
+            function isInside(p, edge) {
+                if (edge === 0) return p.x >= win.xmin;
+                if (edge === 1) return p.x <= win.xmax;
+                if (edge === 2) return p.y >= win.ymin;
+                if (edge === 3) return p.y <= win.ymax;
+                return false;
+            }
+
+            function intersect(v1, v2, edge) {
+                const dx = v2.x - v1.x;
+                const dy = v2.y - v1.y;
+                if (edge === 0) return { x: win.xmin, y: v1.y + dy * (win.xmin - v1.x) / dx };
+                if (edge === 1) return { x: win.xmax, y: v1.y + dy * (win.xmax - v1.x) / dx };
+                if (edge === 2) return { x: v1.x + dx * (win.ymin - v1.y) / dy, y: win.ymin };
+                if (edge === 3) return { x: v1.x + dx * (win.ymax - v1.y) / dy, y: win.ymax };
+                return v1;
+            }
+
+            const edgeNames = ["LEFT (x >= Xmin)", "RIGHT (x <= Xmax)", "BOTTOM (y >= Ymin)", "TOP (y <= Ymax)"];
+            let currentPoly = [...poly];
+
+            function drawPoly(pts, color, width = 2) {
+                if (pts.length < 2) return;
+                ctx.strokeStyle = color;
+                ctx.lineWidth = width;
+                ctx.beginPath();
+                ctx.moveTo(toScreenX(pts[0].x), toScreenY(pts[0].y));
+                for (let i = 1; i < pts.length; i++) {
+                    ctx.lineTo(toScreenX(pts[i].x), toScreenY(pts[i].y));
+                }
+                ctx.closePath();
+                ctx.stroke();
+                pts.forEach(p => plotPixel(p.x, p.y, color, 6));
+            }
+
+            // Draw window
+            ctx.strokeStyle = '#eab308';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(toScreenX(win.xmin), toScreenY(win.ymax), (win.xmax - win.xmin) * 2, (win.ymax - win.ymin) * 2);
+
+            // Draw original in Gray
+            drawPoly(poly, '#475569', 1.5);
+
+            for (let edge = 0; edge < 4; edge++) {
+                let outPoly = [];
+                for (let i = 0; i < currentPoly.length; i++) {
+                    const v1 = currentPoly[i];
+                    const v2 = currentPoly[(i + 1) % currentPoly.length];
+                    const in1 = isInside(v1, edge);
+                    const in2 = isInside(v2, edge);
+
+                    let caseName = '';
+                    let actionText = '';
+
+                    if (in1 && in2) {
+                        caseName = 'Case 1 (IN -> IN)';
+                        actionText = 'Save V2';
+                        outPoly.push(v2);
+                    } else if (in1 && !in2) {
+                        const vInt = intersect(v1, v2, edge);
+                        caseName = 'Case 2 (IN -> OUT)';
+                        actionText = `Save Intersect V'(${Math.round(vInt.x)},${Math.round(vInt.y)})`;
+                        plotPixel(vInt.x, vInt.y, '#ef4444', 8);
+                        outPoly.push(vInt);
+                    } else if (!in1 && !in2) {
+                        caseName = 'Case 3 (OUT -> OUT)';
+                        actionText = 'Discard Both';
+                    } else if (!in1 && in2) {
+                        const vInt = intersect(v1, v2, edge);
+                        caseName = 'Case 4 (OUT -> IN)';
+                        actionText = `Save V'(${Math.round(vInt.x)},${Math.round(vInt.y)}) and V2`;
+                        plotPixel(vInt.x, vInt.y, '#ef4444', 8);
+                        outPoly.push(vInt);
+                        outPoly.push(v2);
+                    }
+
+                    yield {
+                        step: `${edgeNames[edge].split(' ')[0]} Clip`,
+                        coords: `Edge: (${v1.x},${v1.y}) -> (${v2.x},${v2.y})`,
+                        param: `Stage ${edge+1}/4: ${edgeNames[edge]}`,
+                        condition: caseName,
+                        action: actionText
+                    };
+                }
+                currentPoly = outPoly;
+                drawPoly(currentPoly, '#a855f7', 2);
+            }
+
+            // Final clipped polygon in Green
+            drawPoly(currentPoly, '#10b981', 3);
+        }
+
+        // --- Setup UI for Active Algorithm ---
+
+        const algoConfigs = {
+            dda: {
+                title: '✦ DDA Line Drawing Algorithm',
+                inputs: [
+                    { id: 'x1', label: 'X1', val: -50 }, { id: 'y1', label: 'Y1', val: -40 },
+                    { id: 'x2', label: 'X2', val: 70 },  { id: 'y2', label: 'Y2', val: 60 }
+                ],
+                presets: [
+                    { label: 'Positive Slope', vals: { x1: -50, y1: -30, x2: 60, y2: 40 } },
+                    { label: 'Negative Slope', vals: { x1: -40, y1: 50, x2: 60, y2: -30 } }
+                ],
+                explanation: 'Calculates unit increments based on dx and dy differences. Uses floating-point additions and round() per iteration.',
+                makeGen: () => ddaGenerator(
+                    +document.getElementById('input_x1').value,
+                    +document.getElementById('input_y1').value,
+                    +document.getElementById('input_x2').value,
+                    +document.getElementById('input_y2').value
+                )
+            },
+            bresenham: {
+                title: '✦ Bresenham Line Drawing Algorithm',
+                inputs: [
+                    { id: 'x1', label: 'X1', val: -60 }, { id: 'y1', label: 'Y1', val: -30 },
+                    { id: 'x2', label: 'X2', val: 70 },  { id: 'y2', label: 'Y2', val: 50 }
+                ],
+                presets: [
+                    { label: 'Octant 1 (0<m<=1)', vals: { x1: -50, y1: -20, x2: 60, y2: 30 } },
+                    { label: 'Steep (m>1)', vals: { x1: -20, y1: -60, x2: 30, y2: 70 } }
+                ],
+                explanation: 'Highly optimized purely integer line drawing algorithm. Employs an error decision parameter to choose East vs North-East.',
+                makeGen: () => bresenhamGenerator(
+                    +document.getElementById('input_x1').value,
+                    +document.getElementById('input_y1').value,
+                    +document.getElementById('input_x2').value,
+                    +document.getElementById('input_y2').value
+                )
+            },
+            midpointLine: {
+                title: '✦ Midpoint Line Algorithm (All 6 Slopes)',
+                inputs: [
+                    { id: 'x1', label: 'X1', val: -60 }, { id: 'y1', label: 'Y1', val: 40 },
+                    { id: 'x2', label: 'X2', val: 80 },  { id: 'y2', label: 'Y2', val: -30 }
+                ],
+                presets: [
+                    { label: 'Gentle Slope < 0', vals: { x1: -60, y1: 40, x2: 80, y2: -30 } },
+                    { label: 'Gentle Slope > 0', vals: { x1: -50, y1: -30, x2: 70, y2: 40 } },
+                    { label: 'Steep Slope > 1', vals: { x1: -20, y1: -60, x2: 30, y2: 70 } },
+                    { label: 'Steep Slope < -1', vals: { x1: -20, y1: 60, x2: 30, y2: -70 } }
+                ],
+                explanation: 'Evaluates the implicit line equation at geometric midpoints. Satisfies all 6 conditions: slope>0, slope<0, steep, horizontal & vertical.',
+                makeGen: () => midpointLineGenerator(
+                    +document.getElementById('input_x1').value,
+                    +document.getElementById('input_y1').value,
+                    +document.getElementById('input_x2').value,
+                    +document.getElementById('input_y2').value
+                )
+            },
+            midpointCircle: {
+                title: '✦ Midpoint Circle Drawing Algorithm',
+                inputs: [
+                    { id: 'xc', label: 'Center XC', val: 0 },
+                    { id: 'yc', label: 'Center YC', val: 0 },
+                    { id: 'r',  label: 'Radius R',   val: 70 }
+                ],
+                presets: [
+                    { label: 'Center (0,0) R=70', vals: { xc: 0, yc: 0, r: 70 } },
+                    { label: 'Center (-40,20) R=50', vals: { xc: -40, yc: 20, r: 50 } }
+                ],
+                explanation: 'Calculates circle arc for octant 1 (x <= y) using decision d0 = 1 - R, reflecting all 8 symmetric points simultaneously.',
+                makeGen: () => midpointCircleGenerator(
+                    +document.getElementById('input_xc').value,
+                    +document.getElementById('input_yc').value,
+                    +document.getElementById('input_r').value
+                )
+            },
+            cohenSutherland: {
+                title: '✦ Cohen-Sutherland Line Clipping',
+                inputs: [
+                    { id: 'x1', label: 'Line X1', val: -110 }, { id: 'y1', label: 'Line Y1', val: -60 },
+                    { id: 'x2', label: 'Line X2', val: 100 },  { id: 'y2', label: 'Line Y2', val: 90 },
+                    { id: 'xmin', label: 'Win Xmin', val: -60 }, { id: 'ymin', label: 'Win Ymin', val: -40 },
+                    { id: 'xmax', label: 'Win Xmax', val: 60 },  { id: 'ymax', label: 'Win Ymax', val: 60 }
+                ],
+                presets: [
+                    { label: 'Crossing Line', vals: { x1: -110, y1: -60, x2: 100, y2: 90, xmin: -60, ymin: -40, xmax: 60, ymax: 60 } },
+                    { label: 'Fully Inside', vals: { x1: -30, y1: -20, x2: 40, y2: 30, xmin: -60, ymin: -40, xmax: 60, ymax: 60 } }
+                ],
+                explanation: 'Divides 2D plane into 9 regions using 4-bit outcodes. Clips endpoints iteratively until trivially accepted or rejected.',
+                makeGen: () => cohenSutherlandGenerator(
+                    +document.getElementById('input_x1').value,
+                    +document.getElementById('input_y1').value,
+                    +document.getElementById('input_x2').value,
+                    +document.getElementById('input_y2').value,
+                    {
+                        xmin: +document.getElementById('input_xmin').value,
+                        ymin: +document.getElementById('input_ymin').value,
+                        xmax: +document.getElementById('input_xmax').value,
+                        ymax: +document.getElementById('input_ymax').value
+                    }
+                )
+            },
+            sutherlandHodgman: {
+                title: '✦ Sutherland-Hodgman Polygon Clipping',
+                inputs: [
+                    { id: 'xmin', label: 'Win Xmin', val: -70 }, { id: 'ymin', label: 'Win Ymin', val: -50 },
+                    { id: 'xmax', label: 'Win Xmax', val: 70 },  { id: 'ymax', label: 'Win Ymax', val: 70 }
+                ],
+                presets: [
+                    { label: 'Sample Triangle', type: 'tri' },
+                    { label: 'Sample Quad', type: 'quad' },
+                    { label: 'Sample Arrow Shape', type: 'arrow' }
+                ],
+                explanation: 'Clips an arbitrary polygon against Left, Right, Bottom, Top boundaries in a 4-stage pipeline satisfying all 4 cases (IN/OUT).',
+                makeGen: () => {
+                    const win = {
+                        xmin: +document.getElementById('input_xmin').value,
+                        ymin: +document.getElementById('input_ymin').value,
+                        xmax: +document.getElementById('input_xmax').value,
+                        ymax: +document.getElementById('input_ymax').value
+                    };
+                    const poly = window.currentPoly || [
+                        { x: -110, y: -60 }, { x: 0, y: 120 }, { x: 110, y: -60 }
+                    ];
+                    return sutherlandHodgmanGenerator(poly, win);
+                }
+            }
+        };
+
+        function switchAlgorithm(algoKey) {
+            currentAlgo = algoKey;
+            resetAnimation();
+
+            // Highlight tab
+            document.querySelectorAll('.algo-tab').forEach(t => t.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const cfg = algoConfigs[algoKey];
+            document.getElementById('canvasTitle').textContent = cfg.title;
+            document.getElementById('algoExplanation').textContent = cfg.explanation;
+
+            // Render Inputs
+            const inputsContainer = document.getElementById('dynamicInputs');
+            inputsContainer.innerHTML = '';
+            const grid = document.createElement('div');
+            grid.className = 'inputs-grid';
+
+            cfg.inputs.forEach(inp => {
+                const group = document.createElement('div');
+                group.className = 'input-group';
+                group.innerHTML = `<label>${inp.label}</label><input type="number" id="input_${inp.id}" value="${inp.val}" onchange="resetAnimation()">`;
+                grid.appendChild(group);
+            });
+            inputsContainer.appendChild(grid);
+
+            // Render Presets
+            const presetsContainer = document.getElementById('presetsRow');
+            presetsContainer.innerHTML = '';
+            cfg.presets.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-preset';
+                btn.textContent = p.label;
+                btn.onclick = () => {
+                    if (p.vals) {
+                        for (let k in p.vals) {
+                            const el = document.getElementById(`input_${k}`);
+                            if (el) el.value = p.vals[k];
+                        }
+                    } else if (p.type) {
+                        if (p.type === 'tri') window.currentPoly = [{x: -110, y: -60}, {x: 0, y: 120}, {x: 110, y: -60}];
+                        if (p.type === 'quad') window.currentPoly = [{x: -100, y: -70}, {x: -30, y: 110}, {x: 100, y: 60}, {x: 60, y: -80}];
+                        if (p.type === 'arrow') window.currentPoly = [{x: -100, y: -20}, {x: 0, y: 120}, {x: 100, y: -20}, {x: 0, y: 25}];
+                    }
+                    resetAnimation();
+                };
+                presetsContainer.appendChild(btn);
+            });
+
+            drawGrid();
+        }
+
+        // --- Playback & Animation Controller ---
+
+        function togglePlayPause() {
+            if (isRunning) {
+                pauseAnimation();
+            } else {
+                startAnimation();
+            }
+        }
+
+        function startAnimation() {
+            if (!stepGenerator) {
+                drawGrid();
+                stepGenerator = algoConfigs[currentAlgo].makeGen();
+            }
+            isRunning = true;
+            document.getElementById('playIcon').textContent = '⏸';
+            document.getElementById('playText').textContent = 'Pause';
+            document.getElementById('statusTag').textContent = 'Running';
+            document.getElementById('statusTag').style.color = 'var(--primary)';
+
+            animationTimer = setInterval(() => {
+                const { value, done } = stepGenerator.next();
+                if (done) {
+                    pauseAnimation();
+                    document.getElementById('statusTag').textContent = 'Completed';
+                    document.getElementById('statusTag').style.color = 'var(--accent-green)';
+                    document.getElementById('teleAction').textContent = 'Algorithm Finished!';
+                } else {
+                    updateTelemetry(value);
+                }
+            }, animSpeed);
+        }
+
+        function pauseAnimation() {
+            isRunning = false;
+            clearInterval(animationTimer);
+            document.getElementById('playIcon').textContent = '▶';
+            document.getElementById('playText').textContent = 'Animate';
+            if (document.getElementById('statusTag').textContent === 'Running') {
+                document.getElementById('statusTag').textContent = 'Paused';
+                document.getElementById('statusTag').style.color = 'var(--accent-amber)';
+            }
+        }
+
+        function stepForward() {
+            pauseAnimation();
+            if (!stepGenerator) {
+                drawGrid();
+                stepGenerator = algoConfigs[currentAlgo].makeGen();
+            }
+            const { value, done } = stepGenerator.next();
+            if (done) {
+                document.getElementById('statusTag').textContent = 'Completed';
+                document.getElementById('statusTag').style.color = 'var(--accent-green)';
+                document.getElementById('teleAction').textContent = 'Algorithm Finished!';
+            } else {
+                updateTelemetry(value);
+            }
+        }
+
+        function resetAnimation() {
+            pauseAnimation();
+            stepGenerator = null;
+            drawGrid();
+            document.getElementById('statusTag').textContent = 'Ready';
+            document.getElementById('statusTag').style.color = 'var(--text-muted)';
+            updateTelemetry({ step: 0, coords: '(0, 0)', param: 'None', condition: 'Ready', action: 'Awaiting Run' });
+        }
+
+        function updateTelemetry(data) {
+            document.getElementById('teleStep').textContent = data.step;
+            document.getElementById('teleCoords').textContent = data.coords;
+            document.getElementById('teleParam').textContent = data.param;
+            document.getElementById('teleCondition').textContent = data.condition;
+            document.getElementById('teleAction').textContent = data.action;
+        }
+
+        function updateSpeed(val) {
+            animSpeed = +val;
+            document.getElementById('speedVal').textContent = `${val}ms`;
+            if (isRunning) {
+                clearInterval(animationTimer);
+                startAnimation();
+            }
+        }
+
+        // --- Modals ---
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            switchAlgorithm('dda');
+        });
+    </script>
+</body>
+</html>
